@@ -171,9 +171,9 @@ endif()
 ##################################### Set Application options #####################################
 
 ######## Set URLs ########
-set(Launcher_NEWS_RSS_URL "https://prismlauncher.org/feed/feed.xml" CACHE STRING "URL to fetch Prism Launcher's news RSS feed from.")
-set(Launcher_NEWS_OPEN_URL "https://prismlauncher.org/news" CACHE STRING "URL that gets opened when the user clicks 'More News'")
-set(Launcher_WIKI_URL "https://prismlauncher.org/wiki/" CACHE STRING "URL that gets opened when the user clicks 'Launcher Help'")
+set(Launcher_NEWS_RSS_URL "" CACHE STRING "URL to fetch Prism Launcher's news RSS feed from.")
+set(Launcher_NEWS_OPEN_URL "https://github.com/KusokMedi/KorinLauncher/releases" CACHE STRING "URL that gets opened when the user clicks 'More News'")
+set(Launcher_WIKI_URL "https://github.com/KusokMedi/KorinLauncher" CACHE STRING "URL that gets opened when the user clicks 'Launcher Help'")
 set(Launcher_HELP_URL "https://prismlauncher.org/wiki/help-pages/%1" CACHE STRING "URL (with arg %1 to be substituted with page-id) that gets opened when the user requests help in a dialog window")
 set(Launcher_LOGIN_CALLBACK_URL "https://prismlauncher.org/successful-login" CACHE STRING "URL that gets opened when the user successfully logins.")
 set(Launcher_LEGACY_FMLLIBS_BASE_URL "https://files.prismlauncher.org/fmllibs/" CACHE STRING "URL for legacy (<=1.5.2) FML Libraries.")
@@ -184,11 +184,11 @@ set(Launcher_VERSION_MINOR 1)
 set(Launcher_VERSION_PATCH 1)
 set(Launcher_VERSION_BUILD 0)
 
-if(DEFINED ENV{PRISMLAUNCHER_VERSION} AND NOT "$ENV{PRISMLAUNCHER_VERSION}" STREQUAL "")
-    set(Launcher_VERSION_OVERRIDE "$ENV{PRISMLAUNCHER_VERSION}")
+if(DEFINED ENV{KORINLAUNCHER_VERSION} AND NOT "$ENV{KORINLAUNCHER_VERSION}" STREQUAL "")
+    set(Launcher_VERSION_OVERRIDE "$ENV{KORINLAUNCHER_VERSION}")
     string(REGEX MATCH "^([0-9]+)\\.([0-9]+)\\.([0-9]+)(\\.([0-9]+))?$" _Launcher_VERSION_MATCH "${Launcher_VERSION_OVERRIDE}")
     if(NOT _Launcher_VERSION_MATCH)
-        message(FATAL_ERROR "PRISMLAUNCHER_VERSION must be MAJOR.MINOR.PATCH or MAJOR.MINOR.PATCH.BUILD")
+        message(FATAL_ERROR "KORINLAUNCHER_VERSION must be MAJOR.MINOR.PATCH or MAJOR.MINOR.PATCH.BUILD")
     endif()
 
     set(Launcher_VERSION_MAJOR "${CMAKE_MATCH_1}")
@@ -207,7 +207,7 @@ set(Launcher_VERSION_NAME4_COMMA "${Launcher_VERSION_MAJOR},${Launcher_VERSION_M
 set(Launcher_BUILD_PLATFORM "unknown" CACHE STRING "A short string identifying the platform that this build was built for. Only used to display in the about dialog.")
 
 # Github repo URL with releases for updater
-set(Launcher_UPDATER_GITHUB_REPO "https://github.com/Diegiwg/PrismLauncher-Cracked" CACHE STRING "Base github URL for the updater.")
+set(Launcher_UPDATER_GITHUB_REPO "https://github.com/KusokMedi/KorinLauncher" CACHE STRING "Base github URL for the updater.")
 
 # Name to help updater identify valid artifacts
 set(Launcher_BUILD_ARTIFACT "" CACHE STRING "Artifact name to help the updater identify valid artifacts.")
@@ -219,7 +219,7 @@ set(Launcher_META_URL "https://meta.prismlauncher.org/v1/" CACHE STRING "URL to 
 set(Launcher_IMGUR_CLIENT_ID "5b97b0713fba4a3" CACHE STRING "Client ID you can get from Imgur when you register an application")
 
 # Bug tracker URL
-set(Launcher_BUG_TRACKER_URL "https://github.com/Diegiwg/PrismLauncher-Cracked/issues" CACHE STRING "URL for the bug tracker.")
+set(Launcher_BUG_TRACKER_URL "https://github.com/KusokMedi/KorinLauncher/issues" CACHE STRING "URL for the bug tracker.")
 
 # Translations Platform URL
 set(Launcher_TRANSLATIONS_URL "https://hosted.weblate.org/projects/prismlauncher/launcher/" CACHE STRING "URL for the translations platform.")
@@ -358,7 +358,7 @@ include(ECMQtDeclareLoggingCategory)
 
 ####################################### Program Info #######################################
 
-set(Launcher_APP_BINARY_NAME "prismlauncher" CACHE STRING "Name of the Launcher binary")
+set(Launcher_APP_BINARY_NAME "korinlauncher" CACHE STRING "Name of the Launcher binary")
 add_subdirectory(program_info)
 
 ####################################### Install layout #######################################
@@ -390,7 +390,7 @@ if(UNIX AND APPLE)
     set(MACOSX_BUNDLE_BUNDLE_VERSION "${Launcher_VERSION_NAME}")
     set(MACOSX_BUNDLE_SHORT_VERSION_STRING "${Launcher_VERSION_NAME}")
     set(MACOSX_BUNDLE_LONG_VERSION_STRING "${Launcher_VERSION_NAME}")
-    set(MACOSX_BUNDLE_ICON_FILE ${Launcher_Name}.icns)
+    set(MACOSX_BUNDLE_ICON_FILE ${Launcher_Branding_ICNS})
     set(MACOSX_BUNDLE_COPYRIGHT "${Launcher_Copyright_Mac}")
     set(MACOSX_SPARKLE_UPDATE_PUBLIC_KEY "v55ZWWD6QlPoXGV6VLzOTZxZUggWeE51X8cRQyQh6vA=" CACHE STRING "Public key for Sparkle update feed")
     set(MACOSX_SPARKLE_UPDATE_FEED_URL "https://prismlauncher.org/feed/appcast.xml" CACHE STRING "URL for Sparkle update feed")

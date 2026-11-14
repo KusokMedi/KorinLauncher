@@ -1,16 +1,30 @@
 <p align="center">
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="/program_info/org.prismlauncher.PrismLauncher.logo-darkmode.svg">
-  <source media="(prefers-color-scheme: light)" srcset="/program_info/org.prismlauncher.PrismLauncher.logo.svg">
-  <img alt="Prism Launcher" src="/program_info/org.prismlauncher.PrismLauncher.logo.svg" width="40%">
+  <source media="(prefers-color-scheme: dark)" srcset="/program_info/com.kusokmedi.korinlauncher.logo-darkmode.svg">
+  <source media="(prefers-color-scheme: light)" srcset="/program_info/com.kusokmedi.korinlauncher.svg">
+  <img alt="Korin Launcher" src="/program_info/com.kusokmedi.korinlauncher.svg" width="40%">
 </picture>
 </p>
 
-Fork of [Prism Launcher](https://github.com/PrismLauncher/PrismLauncher) enabling offline accounts without Microsoft authentication. Not affiliated with the official project.
+Korin Launcher — a custom Minecraft launcher based on
+[Prism Launcher](https://github.com/PrismLauncher/PrismLauncher), with offline
+accounts (no Microsoft authentication).
 
-## Download
+## Build
 
-Get the latest release from the [**Releases Page**](https://github.com/Diegiwg/PrismLauncher-Cracked/releases).
+```bash
+cmake -S . -B build -G Ninja \
+  -DCMAKE_BUILD_TYPE=Release \
+  -DENABLE_LTO=OFF \
+  -DLauncher_BUILD_PLATFORM=Linux
+ninja -C build
+```
 
-> [!WARNING]
-> DO NOT use official Microsoft/Mojang accounts with this launcher. This bypasses authentication and is intended for offline play only. Using with official servers may violate Minecraft's Terms of Service.
+The launcher jar is compiled against Java 7/8, so configure with a JDK 8
+(`JAVA_HOME=/usr/lib/jvm/java-8-openjdk`) if your default JDK is newer.
+
+## Credits
+
+Based on Prism Launcher (© Prism Launcher Contributors), PolyMC
+(© PolyMC Contributors) and MultiMC (© MultiMC Contributors). Licensed under
+GPL-3.0; see [COPYING.md](COPYING.md).
