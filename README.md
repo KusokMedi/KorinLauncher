@@ -17,10 +17,17 @@ Windows (MSYS2) natively.
 
 ```bash
 ./scripts/deps-arch.sh    # one-time: build dependencies (pacman)
-./scripts/build.sh        # Release build into ./build
+./scripts/build.sh        # Release build into ./build/<version>/<platform>
 ./scripts/build.sh --debug
-./scripts/build.sh --package   # install tree + archive in ./dist
+./scripts/build.sh --package   # install tree + archive in ./dist/<version>/<platform>
 ./scripts/build.sh --help
+```
+
+Builds are kept per version and platform, so old ones are not overwritten:
+
+```
+build/0.1/Linux-x86_64/korinlauncher
+dist/0.1/Linux-x86_64/KorinLauncher-0.1-Linux-x86_64.tar.gz
 ```
 
 `build.sh` finds a JDK 8 automatically: the bundled launcher jar is compiled

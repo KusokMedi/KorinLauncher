@@ -7,15 +7,19 @@
 # CI matrix does it (linux / macos / windows_mingw / windows_msvc).
 #
 # Usage:
-#   ./scripts/build.sh                    # Release build into ./build
+#   ./scripts/build.sh                    # Release build into ./build/<version>/<platform>
 #   ./scripts/build.sh --debug            # Debug build
 #   ./scripts/build.sh -j 4               # limit parallelism
-#   ./scripts/build.sh --clean            # wipe ./build first
+#   ./scripts/build.sh --clean            # wipe this version/platform first
 #   ./scripts/build.sh --lto              # enable link time optimization
 #   ./scripts/build.sh --tests            # build unit tests
-#   ./scripts/build.sh --install [PREFIX] # cmake --install (default ./install)
-#   ./scripts/build.sh --package          # portable archive in ./dist
-#   ./scripts/build.sh --preset linux     # use a CMakePresets.json preset
+#   ./scripts/build.sh --install [PREFIX] # cmake --install (default ./install/<version>/<platform>)
+#   ./scripts/build.sh --package          # portable archive in ./dist/<version>/<platform>
+#   ./scripts/build.sh --preset linux     # use a CMakePresets.json preset (builds into ./build)
+#
+# Layout: every version and platform keeps its own build tree, e.g.
+#   build/0.1/Linux-x86_64/korinlauncher
+# Rebuilding the same version on the same platform reuses (overwrites) that tree.
 #
 # The version comes from ./VERSION (1 to 4 numeric parts).
 
@@ -30,10 +34,10 @@ CLEAN=0
 LTO="OFF"
 TESTS="OFF"
 INSTALL=0
-PREFIX="$ROOT/install"
+PREFIX=""
 PACKAGE=0
 PRESET=""
-BUILD_DIR="$ROOT/build"
+BUILD_DIR=""
 
 usage() {
     awk 'NR>2 && /^#/ { sub(/^# ?/, ""); print; next } NR>2 { exit }' "$0"
@@ -83,7 +87,23 @@ esac
 
 export BUILD_PLATFORM="${PLATFORM}-${ARCH}"
 export ARTIFACT_NAME="KorinLauncher-${VERSION}-${BUILD_PLATFORM}"
+
+# Every version and platform gets its own build tree so old builds survive:
+#   build/0.1/Linux-x86_64/  build/0.2/Linux-x86_64/  build/0.2/Windows-x86_64/
+BUILD_DIR="$ROOT/build/$VERSION/$BUILD_PLATFORM"
+DIST_DIR="$ROOT/dist/$VERSION/$BUILD_PLATFORM"
+
+if [ -z "$PREFIX" ]; then
+    PREFIX="$ROOT/install/$VERSION/$BUILD_PLATFORM"
+fi
+
+if [ -n "$PRESET" ]; then
+    # CMakePresets.json fixes binaryDir to ./build, keep that documented behaviour.
+    BUILD_DIR="$ROOT/build"
+fi
+
 echo "==> Korin Launcher $VERSION ($BUILD_PLATFORM, $CONFIG, -j$JOBS)"
+echo "==> build tree: $BUILD_DIR"
 
 # ---------------------------------------------------------------------------
 # JDK 8: NewLaunch.jar is compiled with -source 7 / -target 7,
@@ -185,21 +205,21 @@ if [ "$INSTALL" = "1" ] && [ "$PACKAGE" = "0" ]; then
 fi
 
 if [ "$PACKAGE" = "1" ]; then
-    DIST="$ROOT/dist/$ARTIFACT_NAME"
+    DIST="$DIST_DIR/$ARTIFACT_NAME"
     rm -rf "$DIST"
     mkdir -p "$DIST"
     echo "==> staging into $DIST"
     cmake --install "$BUILD_DIR" --prefix "$DIST" ${PRESET:+--config "$CONFIG"}
 
-    mkdir -p "$ROOT/dist"
+    mkdir -p "$DIST_DIR"
     if [ "$PLATFORM" = "Windows" ]; then
-        ARCHIVE="$ROOT/dist/$ARTIFACT_NAME.zip"
+        ARCHIVE="$DIST_DIR/$ARTIFACT_NAME.zip"
         rm -f "$ARCHIVE"
-        (cd "$ROOT/dist" && cmake -E tar cf "$ARCHIVE" --format=zip "$ARTIFACT_NAME")
+        (cd "$DIST_DIR" && cmake -E tar cf "$ARCHIVE" --format=zip "$ARTIFACT_NAME")
     else
-        ARCHIVE="$ROOT/dist/$ARTIFACT_NAME.tar.gz"
+        ARCHIVE="$DIST_DIR/$ARTIFACT_NAME.tar.gz"
         rm -f "$ARCHIVE"
-        (cd "$ROOT/dist" && tar czf "$(basename "$ARCHIVE")" "$ARTIFACT_NAME")
+        (cd "$DIST_DIR" && tar czf "$(basename "$ARCHIVE")" "$ARTIFACT_NAME")
     fi
     echo "==> archive: $ARCHIVE"
     echo "    note: it contains the launcher only; Qt/KDSoap runtime libs are not bundled."

@@ -46,15 +46,27 @@ CMake читает его при конфигурации: в UI и `--version` 
 
 ```bash
 ./scripts/deps-arch.sh         # один раз: зависимости через pacman
-./scripts/build.sh             # Release в ./build, параллельно по числу ядер
+./scripts/build.sh             # Release, параллельно по числу ядер
 ./scripts/build.sh --debug     # Debug
-./scripts/build.sh --clean     # снести ./build и собрать заново
+./scripts/build.sh --clean     # снести сборку этой версии/платформы
 ./scripts/build.sh -j 4        # ограничить параллелизм
 ./scripts/build.sh --lto       # включить LTO (долго; в CI включён)
 ./scripts/build.sh --tests     # собрать тесты
-./scripts/build.sh --install   # установить в ./install
-./scripts/build.sh --package   # дерево установки + архив в ./dist
+./scripts/build.sh --install   # установить в ./install/<версия>/<платформа>
+./scripts/build.sh --package   # дерево установки + архив в ./dist/<версия>/<платформа>
 ```
+
+Раскладка сборок — по версии и платформе, старые не затираются:
+
+```
+build/0.1/Linux-x86_64/korinlauncher
+build/0.2/Linux-x86_64/...
+dist/0.1/Linux-x86_64/KorinLauncher-0.1-Linux-x86_64.tar.gz
+install/0.1/Linux-x86_64/bin/korinlauncher
+```
+
+Пересборка той же версии на той же платформе переиспользует (перезаписывает)
+свой каталог; другая версия или другая ОС — отдельный каталог.
 
 Скрипт сам находит JDK 8 (`/usr/lib/jvm/java-8-openjdk` и родственные пути) и
 подставляет `JAVA_HOME`: JDK ≥ 20 отказывается компилировать `NewLaunch.jar` с
@@ -75,7 +87,8 @@ JAVA_HOME=/usr/lib/jvm/java-8-openjdk ninja -C build -j4
 иначе новые значения не подхватятся.
 
 Первая полная сборка на этом ноуте (i5-5300U, 4 потока) ≈ 20–25 минут;
-инкрементальная — секунды/минуты. Долгие сборки запускать в фоне.
+инкрементальная — секунды/минуты. Долгие сборки запускать в фоне. Первая
+сборка новой версии всегда полная (свой build-каталог).
 
 Проверка без GUI:
 
