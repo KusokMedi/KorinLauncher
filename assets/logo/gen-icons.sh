@@ -31,6 +31,10 @@ ico_args=()
 for s in "${ICO_SIZES[@]}"; do ico_args+=("icon-${s}.png"); done
 magick "${ico_args[@]}" icon.ico
 
+echo "==> rendering wordmark"
+rsvg-convert -w 1400 -h 360 logo.svg -o logo.png
+rsvg-convert -w 1400 -h 360 logo-light.svg -o logo-light.png
+
 echo "==> building icon.icns"
 icns_args=()
 for s in "${ICNS_SIZES[@]}"; do icns_args+=("icon-${s}.png"); done

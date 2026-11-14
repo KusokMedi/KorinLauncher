@@ -7,6 +7,9 @@ black / gray / white only.
 | --- | --- |
 | `icon.svg` | Master icon, dark plate (used for the binary, dark themes, ICO/ICNS) |
 | `icon-light.svg` | Light-theme variant (white plate, near-black K) |
+| `logo.svg` | Horizontal lockup: mark + "Korin Launcher" wordmark, dark variant |
+| `logo-light.svg` | Same lockup on light plates |
+| `logo.png`, `logo-light.png` | 1400×360 renders used by the README |
 | `icon.ico` | Windows icon, 16–256 px |
 | `icon.icns` | macOS icon, 16–1024 px (built by `build-icns.py`, no macOS needed) |
 | `icon-<size>.png` | Dark-variant rasters, 16…1024 px |
@@ -15,8 +18,8 @@ black / gray / white only.
 ## Regenerate
 
 ```bash
-./gen-icons.sh            # render all rasters + ico + icns
-./gen-icons.sh --install  # ...and copy into ../../program_info/
+./gen-icons.sh            # rasters + ico + icns + wordmark PNG
+./gen-icons.sh --install  # ...and copy the icon files into ../../program_info/
 ```
 
 Requires `rsvg-convert` (librsvg) and ImageMagick 7 (`magick`). `python3` is
