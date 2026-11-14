@@ -17,18 +17,56 @@ libraries/       libnbtplusplus (submodule), Java-launcher, LocalPeer, rainbow, 
 program_info/    брендинг: имя, AppID, иконки, .desktop, metainfo, man-страница
 buildconfig/     сгенерированный BuildConfig (LAUNCHER_DISPLAYNAME и пр.)
 assets/logo/     исходники логотипа + генератор всех растровых иконок
+scripts/         deps-arch.sh (зависимости), build.sh (сборка и упаковка)
 tests/           gtest-тесты (BUILD_TESTING=OFF в обычной сборке)
 ```
 
+## Платформа разработки
+
+Основная среда — **Arch Linux** (Omarchy на Hyprland). Зависимости для сборки
+ставятся `scripts/deps-arch.sh` (pacman; список пакетов — в самом скрипте).
+На других дистрибутивах скрипт не работает, но пакеты нужны те же: Qt 6.4+
+(base/tools/svg/networkauth/5compat), extra-cmake-modules, cmake, ninja,
+libarchive, zlib, tomlplusplus, cmark, qrencode, gamemode, scdoc, JDK 8.
+
+Кросс-компиляции нет: Linux, macOS и Windows (MSYS2/MSVC) собираются нативно
+тем же `scripts/build.sh` — так же, как это делает CI-матрица апстрима
+(`.github/workflows/build.yml`). Собрать из Linux сборку под Windows нельзя.
+
+## Версия
+
+Единственный источник версии — файл `VERSION` в корне: от 1 до 4 числовых
+частей (`0.1`, `2.445.65`, `2.445.65.1`), без `v` и суффиксов вроде `-beta`.
+CMake читает его при конфигурации: в UI и `--version` попадает строка ровно как
+записана, а для числовых полей Windows/macOS недостающие части считаются нулями.
+Переопределить без правки файла можно переменной `KORINLAUNCHER_VERSION`
+(для CI/упаковки). После изменения `VERSION` нужна переконфигурация сборки.
+
 ## Сборка
 
-JDK по умолчанию (27) не поддерживает `-source 7`, поэтому конфигурировать и
-собирать нужно с JDK 8:
+```bash
+./scripts/deps-arch.sh         # один раз: зависимости через pacman
+./scripts/build.sh             # Release в ./build, параллельно по числу ядер
+./scripts/build.sh --debug     # Debug
+./scripts/build.sh --clean     # снести ./build и собрать заново
+./scripts/build.sh -j 4        # ограничить параллелизм
+./scripts/build.sh --lto       # включить LTO (долго; в CI включён)
+./scripts/build.sh --tests     # собрать тесты
+./scripts/build.sh --install   # установить в ./install
+./scripts/build.sh --package   # дерево установки + архив в ./dist
+```
+
+Скрипт сам находит JDK 8 (`/usr/lib/jvm/java-8-openjdk` и родственные пути) и
+подставляет `JAVA_HOME`: JDK ≥ 20 отказывается компилировать `NewLaunch.jar` с
+`-source 7`. `--install`/`--package` только раскладывают файлы локально и ничего
+не публикуют; в архиве из `--package` нет Qt-библиотек — это не AppImage.
+
+Ручная сборка, если скрипт не подходит:
 
 ```bash
 JAVA_HOME=/usr/lib/jvm/java-8-openjdk cmake -S . -B build -G Ninja \
   -DCMAKE_BUILD_TYPE=Release -DENABLE_LTO=OFF -DBUILD_TESTING=OFF \
-  -DLauncher_BUILD_PLATFORM=Linux
+  -DLauncher_BUILD_PLATFORM=Linux-x86_64
 JAVA_HOME=/usr/lib/jvm/java-8-openjdk ninja -C build -j4
 ```
 

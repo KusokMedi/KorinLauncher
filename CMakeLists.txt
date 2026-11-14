@@ -179,27 +179,46 @@ set(Launcher_LOGIN_CALLBACK_URL "https://prismlauncher.org/successful-login" CAC
 set(Launcher_LEGACY_FMLLIBS_BASE_URL "https://files.prismlauncher.org/fmllibs/" CACHE STRING "URL for legacy (<=1.5.2) FML Libraries.")
 
 ######## Set version numbers ########
-set(Launcher_VERSION_MAJOR 11)
-set(Launcher_VERSION_MINOR 1)
-set(Launcher_VERSION_PATCH 1)
-set(Launcher_VERSION_BUILD 0)
-
-if(DEFINED ENV{KORINLAUNCHER_VERSION} AND NOT "$ENV{KORINLAUNCHER_VERSION}" STREQUAL "")
-    set(Launcher_VERSION_OVERRIDE "$ENV{KORINLAUNCHER_VERSION}")
-    string(REGEX MATCH "^([0-9]+)\\.([0-9]+)\\.([0-9]+)(\\.([0-9]+))?$" _Launcher_VERSION_MATCH "${Launcher_VERSION_OVERRIDE}")
-    if(NOT _Launcher_VERSION_MATCH)
-        message(FATAL_ERROR "KORINLAUNCHER_VERSION must be MAJOR.MINOR.PATCH or MAJOR.MINOR.PATCH.BUILD")
-    endif()
-
-    set(Launcher_VERSION_MAJOR "${CMAKE_MATCH_1}")
-    set(Launcher_VERSION_MINOR "${CMAKE_MATCH_2}")
-    set(Launcher_VERSION_PATCH "${CMAKE_MATCH_3}")
-    if(CMAKE_MATCH_5)
-        set(Launcher_VERSION_BUILD "${CMAKE_MATCH_5}")
-    endif()
+# The launcher version lives in ./VERSION and may have 1 to 4 numeric parts,
+# e.g. "0.1", "2.445.65" or "2.445.65.1". Missing parts are treated as 0 for
+# the Windows/macOS numeric version fields, while the display version stays
+# exactly as written in the file.
+set(Launcher_VERSION_FILE "${CMAKE_CURRENT_SOURCE_DIR}/VERSION")
+if(NOT EXISTS "${Launcher_VERSION_FILE}")
+    message(FATAL_ERROR "VERSION file not found: ${Launcher_VERSION_FILE}")
 endif()
 
-set(Launcher_VERSION_NAME "${Launcher_VERSION_MAJOR}.${Launcher_VERSION_MINOR}.${Launcher_VERSION_PATCH}-${Launcher_VERSION_BUILD}")
+file(STRINGS "${Launcher_VERSION_FILE}" _Launcher_VERSION_LINE LIMIT_COUNT 1)
+string(STRIP "${_Launcher_VERSION_LINE}" _Launcher_VERSION_LINE)
+
+# Allow CI/packaging to override the version without touching the file.
+if(DEFINED ENV{KORINLAUNCHER_VERSION} AND NOT "$ENV{KORINLAUNCHER_VERSION}" STREQUAL "")
+    set(_Launcher_VERSION_LINE "$ENV{KORINLAUNCHER_VERSION}")
+endif()
+
+if(NOT _Launcher_VERSION_LINE MATCHES "^[0-9]+(\\.[0-9]+)?(\\.[0-9]+)?(\\.[0-9]+)?$")
+    message(FATAL_ERROR
+        "VERSION must contain 1 to 4 numeric parts, e.g. 0.1 or 2.445.65.1 (got '${_Launcher_VERSION_LINE}')")
+endif()
+
+string(REPLACE "." ";" _Launcher_VERSION_PARTS "${_Launcher_VERSION_LINE}")
+list(LENGTH _Launcher_VERSION_PARTS _Launcher_VERSION_COUNT)
+
+list(GET _Launcher_VERSION_PARTS 0 Launcher_VERSION_MAJOR)
+set(Launcher_VERSION_MINOR 0)
+set(Launcher_VERSION_PATCH 0)
+set(Launcher_VERSION_BUILD 0)
+if(_Launcher_VERSION_COUNT GREATER 1)
+    list(GET _Launcher_VERSION_PARTS 1 Launcher_VERSION_MINOR)
+endif()
+if(_Launcher_VERSION_COUNT GREATER 2)
+    list(GET _Launcher_VERSION_PARTS 2 Launcher_VERSION_PATCH)
+endif()
+if(_Launcher_VERSION_COUNT GREATER 3)
+    list(GET _Launcher_VERSION_PARTS 3 Launcher_VERSION_BUILD)
+endif()
+
+set(Launcher_VERSION_NAME "${_Launcher_VERSION_LINE}")
 set(Launcher_VERSION_NAME4 "${Launcher_VERSION_MAJOR}.${Launcher_VERSION_MINOR}.${Launcher_VERSION_PATCH}.${Launcher_VERSION_BUILD}")
 set(Launcher_VERSION_NAME4_COMMA "${Launcher_VERSION_MAJOR},${Launcher_VERSION_MINOR},${Launcher_VERSION_PATCH},${Launcher_VERSION_BUILD}")
 

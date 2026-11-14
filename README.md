@@ -12,16 +12,23 @@ accounts (no Microsoft authentication).
 
 ## Build
 
+Development targets **Arch Linux**; the same script also works on macOS and
+Windows (MSYS2) natively.
+
 ```bash
-JAVA_HOME=/usr/lib/jvm/java-8-openjdk cmake -S . -B build -G Ninja \
-  -DCMAKE_BUILD_TYPE=Release \
-  -DENABLE_LTO=OFF \
-  -DLauncher_BUILD_PLATFORM=Linux
-JAVA_HOME=/usr/lib/jvm/java-8-openjdk ninja -C build
+./scripts/deps-arch.sh    # one-time: build dependencies (pacman)
+./scripts/build.sh        # Release build into ./build
+./scripts/build.sh --debug
+./scripts/build.sh --package   # install tree + archive in ./dist
+./scripts/build.sh --help
 ```
 
-The launcher jar is compiled against Java 7/8, so configure with a JDK 8
-(`JAVA_HOME=/usr/lib/jvm/java-8-openjdk`) if your default JDK is newer.
+`build.sh` finds a JDK 8 automatically: the bundled launcher jar is compiled
+with `-source 7`, which JDK ≥ 20 rejects.
+
+The version lives in [`VERSION`](VERSION) and may have up to four numeric parts
+(`0.1`, `2.445.65.1`). No cross-compiling — Windows/macOS builds run on their own
+system (see the CI workflows).
 
 ## Credits
 
