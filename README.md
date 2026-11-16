@@ -10,6 +10,9 @@ Korin Launcher — a custom Minecraft launcher based on
 [Prism Launcher](https://github.com/PrismLauncher/PrismLauncher), with offline
 accounts (no Microsoft authentication).
 
+
+[![License](https://img.shields.io/github/license/KusokMedi/KorinLauncher)](LICENSE) [![Sponsor](https://img.shields.io/badge/Sponsor-GitHub-pink)](https://github.com/sponsors/KusokMedi) [![Patreon](https://img.shields.io/badge/Patreon-kusokmedi-orange)](https://www.patreon.com/kusokmedi)
+
 ## Build
 
 Development targets **Arch Linux**; the same script also works on macOS and
@@ -42,3 +45,10 @@ system (see the CI workflows).
 Based on Prism Launcher (© Prism Launcher Contributors), PolyMC
 (© PolyMC Contributors) and MultiMC (© MultiMC Contributors). Licensed under
 GPL-3.0; see [COPYING.md](COPYING.md).
+
+## Support
+
+If you find this project useful, consider supporting:
+
+- GitHub Sponsors: https://github.com/sponsors/KusokMedi
+- Patreon: https://www.patreon.com/kusokmedi
